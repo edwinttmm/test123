@@ -1,0 +1,15 @@
+{
+  "name": "digital-employees-platform",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run -ws build",
+    "dev": "npm run -ws dev",
+    "test": "npm run -ws test",
+    "lint": "npm run -ws lint"
+  }
+}

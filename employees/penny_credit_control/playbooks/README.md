@@ -1,0 +1,5 @@
+- reconcile_0700: match transactions to invoices, mark paid, send thank-you email.
+- gentle_nudge_0900: email customers due in 3 days.
+- overdue_1400: overdue reminder and escalation task.
+- call_1600: voice follow-up for 14+ days overdue (BULLDOG).
+- weekly_red_list: produce owner report.
