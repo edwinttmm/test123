@@ -1,0 +1,1 @@
+{"type":"object","properties":{"summary":{"type":"string"},"promised_pay_date":{"type":"string"},"dispute_flag":{"type":"boolean"},"next_action":{"type":"string"}},"required":["summary","dispute_flag","next_action"],"additionalProperties":false}

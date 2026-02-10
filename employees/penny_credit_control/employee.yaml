@@ -1,0 +1,27 @@
+name: penny_credit_control
+role: Credit Control & Admin Assistant
+plan_gating:
+  ADMIN: [send_email]
+  BULLDOG: [send_email, start_outbound_call]
+allowed_tools:
+  - send_email
+  - get_open_invoices
+  - mark_invoice_paid
+  - fetch_transactions
+  - start_outbound_call
+  - create_owner_task
+  - generate_report_file
+playbooks:
+  - id: reconcile_0700
+    schedule: "0 7 * * *"
+  - id: gentle_nudge_0900
+    schedule: "0 9 * * *"
+  - id: overdue_1400
+    schedule: "0 14 * * *"
+  - id: call_1600
+    schedule: "0 16 * * *"
+  - id: weekly_red_list
+    schedule: "0 9 * * 1"
+rules:
+  max_attempts: 3
+  stop_on_dispute: true

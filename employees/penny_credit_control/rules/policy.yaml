@@ -1,0 +1,3 @@
+stop_if_dispute: true
+max_automated_attempts: 3
+respect_do_not_contact: true

@@ -1,0 +1,35 @@
+version: '3.9'
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: digital_employees
+    ports: ["5432:5432"]
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7
+    ports: ["6379:6379"]
+
+  api:
+    build: ./apps/api
+    env_file: .env
+    ports: ["4000:4000"]
+    depends_on: [postgres, redis]
+
+  worker:
+    build: ./apps/worker
+    env_file: .env
+    depends_on: [api, redis, postgres]
+
+  web:
+    build: ./apps/web
+    env_file: .env
+    ports: ["3000:3000"]
+    depends_on: [api]
+
+volumes:
+  pg_data:
