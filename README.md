@@ -54,6 +54,13 @@ Multi-tenant SaaS wrapper platform for deterministic AI employees.
   - ongoing deploy workflow
 
 
+
+## SaaS Membership & Team Management
+- On signup, a tenant + owner account are created immediately.
+- Owner/admin can create users directly (`POST /users`) or invite members (`POST /users/invite`) and users complete onboarding via `POST /auth/accept-invite`.
+- Stripe checkout is tenant-linked; on successful checkout/subscription webhook, tenant plan + subscription status are updated automatically.
+- Billing status endpoint (`GET /billing/status`) exposes current plan and subscription state for dashboard gating.
+
 ## Security & Access Control
 - JWT-based auth with signup/login endpoints and role-aware access checks (`owner`, `admin`, `viewer`).
 - Tenant settings include secure integration-key storage through API endpoints, so keys can be added **after deployment** from the running app.

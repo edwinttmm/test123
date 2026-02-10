@@ -250,6 +250,18 @@ docker compose restart api
 
 ---
 
+
+## 10.1) SaaS Membership Lifecycle (How it works)
+
+- `POST /auth/signup`: creates tenant + owner user.
+- `POST /billing/checkout`: owner/admin starts Stripe checkout tied to tenant/customer metadata.
+- `checkout.session.completed` + subscription webhooks: automatically set `stripe_subscription_id`, `plan`, and `plan_status` on tenant.
+- Team growth: owner/admin can invite users with `POST /users/invite`; invitee completes account via `POST /auth/accept-invite`.
+
+This gives automatic tenant membership provisioning after payment completion while keeping role controls in place.
+
+---
+
 ## 11) Verify Production Health
 
 ```bash
@@ -290,10 +302,10 @@ docker compose exec api npx prisma migrate deploy
 ## 14) What to Change Before Real SaaS Launch
 
 1. **Auth hardening**
-   - Add login endpoint + JWT issuance/refresh flow.
+   - Add refresh-token/session revocation and MFA for owner/admin users.
 2. **Billing correctness**
    - Verify Stripe webhook signatures.
-   - Handle checkout session linkage to tenant/customer IDs.
+   - Add dunning + cancellation lifecycle handling.
 3. **Runtime safety**
    - Persist idempotency checks in DB before tool execution.
 4. **Observability**

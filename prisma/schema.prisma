@@ -34,6 +34,13 @@ enum Actor {
   user
 }
 
+enum InviteStatus {
+  pending
+  accepted
+  revoked
+  expired
+}
+
 model Tenant {
   id                     String         @id @default(cuid())
   name                   String
@@ -54,6 +61,7 @@ model Tenant {
   tasks                  Task[]
   audit_logs             AuditLog[]
   integration_secrets    IntegrationSecret[]
+  invites                UserInvite[]
 }
 
 model User {
@@ -64,6 +72,7 @@ model User {
   role          UserRole
   tenant        Tenant   @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
   updated_secrets IntegrationSecret[] @relation("updated_by_user")
+  created_invites UserInvite[] @relation("invite_created_by")
 }
 
 model Customer {
@@ -161,4 +170,24 @@ model IntegrationSecret {
 
   @@unique([tenant_id, provider])
   @@index([tenant_id, updated_at])
+}
+
+
+model UserInvite {
+  id                 String       @id @default(cuid())
+  tenant_id          String
+  email              String
+  role               UserRole
+  token              String       @unique
+  status             InviteStatus @default(pending)
+  created_by_user_id String
+  expires_at         DateTime
+  accepted_at        DateTime?
+  created_at         DateTime     @default(now())
+
+  tenant             Tenant       @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+  created_by_user    User         @relation("invite_created_by", fields: [created_by_user_id], references: [id], onDelete: Cascade)
+
+  @@index([tenant_id, status])
+  @@index([email])
 }
