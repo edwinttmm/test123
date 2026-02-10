@@ -1,0 +1,27 @@
+{
+  "name": "@digital/api",
+  "version": "0.1.0",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "test": "echo no-tests",
+    "lint": "echo lint api"
+  },
+  "dependencies": {
+    "@digital/employee-runtime": "0.1.0",
+    "@digital/integrations": "0.1.0",
+    "@digital/shared": "0.1.0",
+    "@prisma/client": "^5.22.0",
+    "bcryptjs": "^2.4.3",
+    "fastify": "^5.0.0",
+    "fastify-jwt": "^4.2.0",
+    "stripe": "^17.4.0"
+  },
+  "devDependencies": {
+    "prisma": "^5.22.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
+  }
+}

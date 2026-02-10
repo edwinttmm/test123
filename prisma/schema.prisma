@@ -1,0 +1,145 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Plan {
+  ADMIN
+  BULLDOG
+}
+
+enum PlanStatus {
+  active
+  past_due
+  canceled
+}
+
+enum UserRole {
+  owner
+  admin
+  viewer
+}
+
+enum Channel {
+  email
+  call
+}
+
+enum Actor {
+  system
+  user
+}
+
+model Tenant {
+  id                     String         @id @default(cuid())
+  name                   String
+  timezone               String
+  plan                   Plan           @default(ADMIN)
+  plan_status            PlanStatus     @default(active)
+  stripe_customer_id     String?
+  stripe_subscription_id String?
+  automations_enabled    Boolean        @default(true)
+  createdAt              DateTime       @default(now())
+  updatedAt              DateTime       @updatedAt
+
+  users                  User[]
+  customers              Customer[]
+  invoices               Invoice[]
+  chase_attempts         ChaseAttempt[]
+  call_summaries         CallSummary[]
+  tasks                  Task[]
+  audit_logs             AuditLog[]
+}
+
+model User {
+  id            String   @id @default(cuid())
+  tenant_id     String
+  email         String   @unique
+  password_hash String
+  role          UserRole
+  tenant        Tenant   @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+}
+
+model Customer {
+  id           String    @id @default(cuid())
+  tenant_id    String
+  name         String
+  email        String?
+  phone        String?
+  do_not_email Boolean   @default(false)
+  do_not_call  Boolean   @default(false)
+  tenant       Tenant    @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+  invoices     Invoice[]
+}
+
+model Invoice {
+  id             String      @id @default(cuid())
+  tenant_id      String
+  customer_id    String
+  external_id    String
+  amount_pennies Int
+  currency       String
+  due_date       DateTime
+  status         String
+  last_chased_at DateTime?
+  tenant         Tenant      @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+  customer       Customer    @relation(fields: [customer_id], references: [id], onDelete: Cascade)
+  chase_attempts ChaseAttempt[]
+  call_summaries CallSummary[]
+
+  @@index([tenant_id, due_date])
+}
+
+model ChaseAttempt {
+  id              String   @id @default(cuid())
+  tenant_id       String
+  invoice_id      String
+  channel         Channel
+  template_id     String
+  idempotency_key String   @unique
+  outcome         String
+  raw_payload     Json
+  sent_at         DateTime
+  tenant          Tenant   @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+  invoice         Invoice  @relation(fields: [invoice_id], references: [id], onDelete: Cascade)
+}
+
+model CallSummary {
+  id                String   @id @default(cuid())
+  tenant_id         String
+  invoice_id        String
+  transcript        String
+  summary           String
+  promised_pay_date DateTime?
+  dispute_flag      Boolean  @default(false)
+  next_action       String
+  tenant            Tenant   @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+  invoice           Invoice  @relation(fields: [invoice_id], references: [id], onDelete: Cascade)
+}
+
+model Task {
+  id        String   @id @default(cuid())
+  tenant_id String
+  type      String
+  status    String
+  payload   Json
+  tenant    Tenant   @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  tenant_id   String
+  actor       Actor
+  action_type String
+  entity_type String
+  entity_id   String
+  payload     Json
+  createdAt   DateTime @default(now())
+  tenant      Tenant   @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+
+  @@index([tenant_id, createdAt])
+}
