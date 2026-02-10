@@ -53,6 +53,7 @@ model Tenant {
   call_summaries         CallSummary[]
   tasks                  Task[]
   audit_logs             AuditLog[]
+  integration_secrets    IntegrationSecret[]
 }
 
 model User {
@@ -62,6 +63,7 @@ model User {
   password_hash String
   role          UserRole
   tenant        Tenant   @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+  updated_secrets IntegrationSecret[] @relation("updated_by_user")
 }
 
 model Customer {
@@ -142,4 +144,21 @@ model AuditLog {
   tenant      Tenant   @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
 
   @@index([tenant_id, createdAt])
+}
+
+
+model IntegrationSecret {
+  id                 String   @id @default(cuid())
+  tenant_id          String
+  provider           String
+  encrypted_secret   String
+  updated_by_user_id String
+  created_at         DateTime @default(now())
+  updated_at         DateTime @updatedAt
+
+  tenant             Tenant   @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+  updated_by_user    User     @relation("updated_by_user", fields: [updated_by_user_id], references: [id], onDelete: Cascade)
+
+  @@unique([tenant_id, provider])
+  @@index([tenant_id, updated_at])
 }

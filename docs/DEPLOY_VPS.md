@@ -116,8 +116,12 @@ nano .env
 - `JWT_SECRET`
   - Generate random secret:
     - `openssl rand -base64 48`
+- `SECRETS_ENCRYPTION_KEY`
+  - Required for at-rest encryption of integration keys saved from Settings UI:
+    - `openssl rand -base64 48`
 - `OPENAI_API_KEY`
-  - OpenAI dashboard → API keys
+  - Optional at boot if you plan to add provider keys from the running Settings page.
+  - Otherwise set global default from OpenAI dashboard.
 - `STRIPE_SECRET_KEY`
   - Stripe dashboard → Developers → API keys
 - `STRIPE_WEBHOOK_SECRET`
@@ -127,6 +131,18 @@ nano .env
     - `https://api.yourdomain.com`
 
 > Important: never commit `.env` to GitHub.
+
+
+## 6.1) Add API Keys Later from the Running App
+
+Yes — you can deploy first and add provider keys after login.
+
+- Login as `owner` or `admin`.
+- Open `https://app.yourdomain.com/settings`.
+- Submit provider + key.
+- Backend stores encrypted key in DB and writes an audit log entry.
+
+This avoids keeping many third-party keys in server env files.
 
 ---
 

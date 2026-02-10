@@ -52,3 +52,14 @@ Multi-tenant SaaS wrapper platform for deterministic AI employees.
   - where to place API keys and SaaS env vars
   - Stripe webhook setup
   - ongoing deploy workflow
+
+
+## Security & Access Control
+- JWT-based auth with signup/login endpoints and role-aware access checks (`owner`, `admin`, `viewer`).
+- Tenant settings include secure integration-key storage through API endpoints, so keys can be added **after deployment** from the running app.
+- Integration secrets are encrypted server-side using `SECRETS_ENCRYPTION_KEY`.
+
+### Runtime key management
+1. Login as owner/admin and get a JWT token from `/auth/login`.
+2. Open `/settings` in the web app and submit provider + API key.
+3. API stores key encrypted in database (`integration_secrets`).
